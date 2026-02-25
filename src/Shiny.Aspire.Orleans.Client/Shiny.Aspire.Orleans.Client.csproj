@@ -1,19 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <RootNamespace>Shiny.Aspire.Orleans.Client</RootNamespace>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.Aspire.Orleans.Client</RootNamespace>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <InternalsVisibleTo Include="Shiny.Aspire.Orleans.Tests" />
-  </ItemGroup>
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Aspire.Orleans.Tests"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Orleans.Server" />
-    <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" />
-    <PackageReference Include="Microsoft.Data.SqlClient" />
-    <PackageReference Include="Npgsql" />
-    <PackageReference Include="MySqlConnector" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Orleans.Server"/>
+        <PackageReference Include="Microsoft.Orleans.Clustering.AdoNet"/>
+        <PackageReference Include="Microsoft.Data.SqlClient"/>
+        <PackageReference Include="Npgsql"/>
+        <PackageReference Include="MySqlConnector"/>
+        <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all"/>
+    </ItemGroup>
 
 </Project>

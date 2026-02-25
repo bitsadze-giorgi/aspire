@@ -1,8 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
-  <ItemGroup>
-    <ProjectReference Include="..\Sample.GrainInterfaces\Sample.GrainInterfaces.csproj" />
-    <ProjectReference Include="..\..\src\Shiny.Aspire.Orleans.Client\Shiny.Aspire.Orleans.Client.csproj" />
-  </ItemGroup>
-
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Sample.GrainInterfaces\Sample.GrainInterfaces.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Aspire.Orleans.Client\Shiny.Aspire.Orleans.Client.csproj"/>
+    </ItemGroup>
 </Project>

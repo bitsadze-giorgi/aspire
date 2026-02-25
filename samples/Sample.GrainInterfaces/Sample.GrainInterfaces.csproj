@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Orleans.Server" />
-  </ItemGroup>
-
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Orleans.Server"/>
+    </ItemGroup>
 </Project>

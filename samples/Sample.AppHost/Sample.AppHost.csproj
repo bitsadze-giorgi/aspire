@@ -1,22 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <Sdk Name="Aspire.AppHost.Sdk" Version="13.1.1" />
+    <Sdk Name="Aspire.AppHost.Sdk" Version="$(AspireVersion)"/>
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <IsAspireHost>true</IsAspireHost>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <OutputType>Exe</OutputType>
+        <IsAspireHost>true</IsAspireHost>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Aspire.Hosting.AppHost" />
-    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting.AppHost"/>
+        <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Sample.Silo\Sample.Silo.csproj" />
-    <ProjectReference Include="..\Sample.Api\Sample.Api.csproj" />
-    <ProjectReference Include="..\..\src\Shiny.Aspire.Orleans.Hosting\Shiny.Aspire.Orleans.Hosting.csproj"
-                      IsAspireProjectResource="false" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Sample.Silo\Sample.Silo.csproj"/>
+        <ProjectReference Include="..\Sample.Api\Sample.Api.csproj"/>
+        <ProjectReference Include="..\..\src\Shiny.Aspire.Orleans.Hosting\Shiny.Aspire.Orleans.Hosting.csproj"
+                          IsAspireProjectResource="false"/>
+    </ItemGroup>
 
 </Project>

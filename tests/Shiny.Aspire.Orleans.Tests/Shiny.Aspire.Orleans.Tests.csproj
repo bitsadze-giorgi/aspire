@@ -1,25 +1,26 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" />
-    <PackageReference Include="xunit" />
-    <PackageReference Include="xunit.runner.visualstudio">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-    <PackageReference Include="Shouldly" />
-    <PackageReference Include="NSubstitute" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
+        <PackageReference Include="xunit"/>
+        <PackageReference Include="xunit.runner.visualstudio">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Shouldly"/>
+        <PackageReference Include="NSubstitute"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="../../src/Shiny.Aspire.Orleans.Client/Shiny.Aspire.Orleans.Client.csproj" />
-    <ProjectReference Include="../../src/Shiny.Aspire.Orleans.Server/Shiny.Aspire.Orleans.Server.csproj" />
-    <ProjectReference Include="../../src/Shiny.Aspire.Orleans.Hosting/Shiny.Aspire.Orleans.Hosting.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="../../src/Shiny.Aspire.Orleans.Client/Shiny.Aspire.Orleans.Client.csproj"/>
+        <ProjectReference Include="../../src/Shiny.Aspire.Orleans.Server/Shiny.Aspire.Orleans.Server.csproj"/>
+        <ProjectReference Include="../../src/Shiny.Aspire.Orleans.Hosting/Shiny.Aspire.Orleans.Hosting.csproj"/>
+    </ItemGroup>
 
 </Project>

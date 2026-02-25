@@ -1,11 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\Sample.GrainInterfaces\Sample.GrainInterfaces.csproj" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Sample.GrainInterfaces\Sample.GrainInterfaces.csproj"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Orleans.Server" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Orleans.Server"/>
+    </ItemGroup>
 
 </Project>

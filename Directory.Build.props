@@ -1,8 +1,36 @@
 <Project>
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-  </PropertyGroup>
+    <PropertyGroup>
+        <BaseTargetFramework>net10.0</BaseTargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+        <Authors>aritchie;ShinyLib</Authors>
+
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/shinyorg/aspire</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/shinyorg/aspire</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <PackageIcon>icon.png</PackageIcon>
+        <PackageReadmeFile>readme.md</PackageReadmeFile>
+        <PackageReleaseNotes>https://shinylib.net/release-notes</PackageReleaseNotes>
+        <PackageProjectUrl>https://shinylib.net</PackageProjectUrl>
+        <PackageTags>aspire orleans clustering persistence reminders shiny</PackageTags>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+        <IncludeSource>True</IncludeSource>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PublishRepositoryUrl>True</PublishRepositoryUrl>
+        <EmbedUntrackedSources>True</EmbedUntrackedSources>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="$(MSBuildThisFileDirectory)nuget.png" Pack="true" PackagePath="icon.png"/>
+        <None Include="$(MSBuildThisFileDirectory)nuget.txt" Pack="true" PackagePath="readme.txt"/>
+        <None Include="$(MSBuildThisFileDirectory)readme.md" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 </Project>
