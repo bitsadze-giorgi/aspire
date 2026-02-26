@@ -10,11 +10,11 @@ Zero-friction integration between [.NET Aspire](https://learn.microsoft.com/dotn
 
 ## Packages
 
-| Package | Usage |
-|---|---|
-| `Shiny.Aspire.Orleans.Hosting` | Aspire AppHost -- auto-runs Orleans schema scripts when the database becomes ready |
-| `Shiny.Aspire.Orleans.Server` | Orleans silo -- configures ADO.NET clustering, grain storage, and reminders from Aspire config |
-| `Shiny.Aspire.Orleans.Client` | Orleans client -- configures ADO.NET clustering from Aspire config |
+| Package | NuGet | Usage |
+|---|---|---|
+| `Shiny.Aspire.Orleans.Hosting` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Hosting.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Hosting) | Aspire AppHost -- auto-runs Orleans schema scripts when the database becomes ready |
+| `Shiny.Aspire.Orleans.Server` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Server.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Server) | Orleans silo -- configures ADO.NET clustering, grain storage, and reminders from Aspire config |
+| `Shiny.Aspire.Orleans.Client` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Client.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Client) | Orleans client -- configures ADO.NET clustering from Aspire config |
 
 ## Quick Start
 
