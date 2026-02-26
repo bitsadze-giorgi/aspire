@@ -34,11 +34,11 @@ jobs:
         run: |
           # Copy skills content only (not plugin manifests)
           # The target repo has its own plugin structure
-          if [ -d "source/skills/shiny-aspire-orleans" ]; then
+          if [ -d "source/skills/shiny-aspire" ]; then
             # Remove existing skill directory to ensure clean sync
-            rm -rf skills-repo/skills/shiny-aspire-orleans
+            rm -rf skills-repo/skills/shiny-aspire
             mkdir -p skills-repo/skills
-            cp -r source/skills/shiny-aspire-orleans skills-repo/skills/
+            cp -r source/skills/shiny-aspire skills-repo/skills/
           fi
 
       - name: Create Pull Request
@@ -46,17 +46,17 @@ jobs:
         with:
           token: ${{ secrets.SKILLS_REPO_TOKEN }}
           path: skills-repo
-          commit-message: "Update shiny-aspire-orleans skill from aspire repository"
-          title: "Update shiny-aspire-orleans skill"
+          commit-message: "Update shiny-aspire skill from aspire repository"
+          title: "Update shiny-aspire skill"
           body: |
-            This PR updates the shiny-aspire-orleans skill from the [aspire repository](https://github.com/shinyorg/aspire).
+            This PR updates the shiny-aspire skill from the [aspire repository](https://github.com/shinyorg/aspire).
 
             **Source commit:** ${{ github.sha }}
             **Triggered by:** @${{ github.actor }}
 
             ---
             *This PR was automatically created by the [sync-skills workflow](https://github.com/shinyorg/aspire/actions/workflows/sync-skills.yml).*
-          branch: update-shiny-aspire-orleans-skill
+          branch: update-shiny-aspire-skill
           delete-branch: true
           labels: |
             automated
