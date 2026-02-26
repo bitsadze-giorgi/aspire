@@ -1,4 +1,4 @@
-# Shiny.Aspire.Orleans
+# Shiny Aspire Libraries
 
 Zero-friction integration between [.NET Aspire](https://learn.microsoft.com/dotnet/aspire/) and [Microsoft Orleans](https://learn.microsoft.com/dotnet/orleans/) for ADO.NET storage backends. Automatically provisions Orleans database schemas and wires up clustering, grain persistence, and reminders from Aspire configuration -- no manual SQL scripts or connection string plumbing required.
 
@@ -189,8 +189,156 @@ Run the sample:
 dotnet run --project samples/Sample.AppHost
 ```
 
+---
+
+# Shiny.Aspire.Hosting.Gluetun
+
+Aspire hosting integration for [Gluetun](https://github.com/qdm12/gluetun), a lightweight VPN client container supporting multiple providers. Models Gluetun as a first-class Aspire resource and lets other containers route their traffic through the VPN tunnel.
+
+## Package
+
+| Package | NuGet | Usage |
+|---|---|---|
+| `Shiny.Aspire.Hosting.Gluetun` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Hosting.Gluetun.svg)](https://www.nuget.org/packages/Shiny.Aspire.Hosting.Gluetun) | Aspire AppHost -- adds a Gluetun VPN container and routes other containers through it |
+
+## Quick Start
+
+Install `Shiny.Aspire.Hosting.Gluetun` in your AppHost project.
+
+```csharp
+var builder = DistributedApplication.CreateBuilder(args);
+
+var vpn = builder.AddGluetun("vpn")
+    .WithVpnProvider("mullvad")
+    .WithWireGuard(builder.AddParameter("wireguard-key", secret: true))
+    .WithServerCountries("US", "Canada");
+
+var scraper = builder.AddContainer("scraper", "my-scraper")
+    .WithHttpEndpoint(targetPort: 8080);
+
+vpn.WithRoutedContainer(scraper);
+
+builder.Build().Run();
+```
+
+This creates a Gluetun VPN container with Mullvad WireGuard, then routes the `scraper` container's traffic through it. At runtime the scraper joins the Gluetun network namespace (`--network container:vpn`). On Docker Compose publish, routed containers get `network_mode: "service:vpn"` and their ports are transferred to the Gluetun service.
+
+## API Reference
+
+### AddGluetun
+
+Creates a Gluetun container resource with `NET_ADMIN` capability and `/dev/net/tun` device access.
+
+```csharp
+IResourceBuilder<GluetunResource> AddGluetun(
+    this IDistributedApplicationBuilder builder,
+    string name,
+    int? httpProxyPort = null,
+    int? shadowsocksPort = null)
+```
+
+The optional port parameters expose Gluetun's built-in HTTP proxy (default target 8888) and Shadowsocks proxy (default target 8388) endpoints.
+
+### VPN Provider Configuration
+
+```csharp
+// Set the VPN service provider (required)
+vpn.WithVpnProvider("mullvad");
+
+// OpenVPN -- string credentials
+vpn.WithOpenVpn("username", "password");
+
+// OpenVPN -- Aspire parameter resources (recommended for secrets)
+vpn.WithOpenVpn(
+    builder.AddParameter("openvpn-user"),
+    builder.AddParameter("openvpn-pass", secret: true));
+
+// WireGuard -- string key
+vpn.WithWireGuard("my-private-key");
+
+// WireGuard -- Aspire parameter resource (recommended for secrets)
+vpn.WithWireGuard(builder.AddParameter("wireguard-key", secret: true));
+```
+
+### Server Selection
+
+```csharp
+vpn.WithServerCountries("US", "Canada", "Germany");
+vpn.WithServerCities("New York", "Toronto");
+```
+
+Values are comma-joined and set as `SERVER_COUNTRIES` / `SERVER_CITIES` environment variables.
+
+### Proxy Features
+
+```csharp
+vpn.WithHttpProxy();           // enables Gluetun's built-in HTTP proxy (HTTPPROXY=on)
+vpn.WithHttpProxy(false);      // disables it (HTTPPROXY=off)
+vpn.WithShadowsocks();         // enables Shadowsocks proxy (SHADOWSOCKS=on)
+vpn.WithShadowsocks(false);    // disables it (SHADOWSOCKS=off)
+```
+
+### Network & Firewall
+
+```csharp
+vpn.WithFirewallOutboundSubnets("10.0.0.0/8", "192.168.0.0/16");
+vpn.WithTimezone("America/New_York");
+```
+
+### Generic Environment Variables
+
+Pass any Gluetun environment variable not covered by the typed methods:
+
+```csharp
+vpn.WithGluetunEnvironment("DNS_ADDRESS", "1.1.1.1");
+vpn.WithGluetunEnvironment("UPDATER_PERIOD", builder.AddParameter("updater-period"));
+```
+
+### Routing Containers Through the VPN
+
+```csharp
+vpn.WithRoutedContainer(scraper);
+vpn.WithRoutedContainer(downloader);
+```
+
+Each call:
+1. Adds a `GluetunRoutedResourceAnnotation` to the Gluetun resource
+2. Sets `--network container:<vpn-name>` runtime args on the routed container
+3. On Docker Compose publish, sets `network_mode: "service:<vpn-name>"` on the routed container and transfers its port mappings to the Gluetun service
+
+You can route multiple containers through the same VPN.
+
+## Docker Compose Publish
+
+When you publish with `dotnet run --publisher manifest` or Docker Compose, routed containers automatically get:
+
+```yaml
+services:
+  vpn:
+    image: qmcgaw/gluetun:latest
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun
+    environment:
+      - VPN_SERVICE_PROVIDER=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=${wireguard-key}
+      - SERVER_COUNTRIES=US,Canada
+    ports:
+      - "8080:8080"    # forwarded from scraper
+  scraper:
+    image: my-scraper
+    network_mode: "service:vpn"
+    # ports moved to vpn service
+```
+
+## Supported VPN Providers
+
+Gluetun supports 30+ VPN providers. See the [Gluetun wiki](https://github.com/qdm12/gluetun-wiki) for the full list and provider-specific environment variables. Use `WithGluetunEnvironment` for any provider-specific settings not covered by the typed methods.
+
 ## Requirements
 
 - .NET 10
 - .NET Aspire 13.1+
-- Microsoft Orleans 10.0+
+- Microsoft Orleans 10.0+ (for Orleans packages only)

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>$(BaseTargetFramework)</TargetFramework>
+        <RootNamespace>Shiny.Aspire.Hosting.Gluetun</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="Shiny.Aspire.Hosting.Gluetun.Tests"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Aspire.Hosting"/>
+        <PackageReference Include="Aspire.Hosting.Docker"/>
+        <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all"/>
+    </ItemGroup>
+
+</Project>
