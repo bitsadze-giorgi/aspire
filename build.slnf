@@ -1,0 +1,13 @@
+﻿{
+  "solution": {
+    "path": "Shiny.Aspire.slnx",
+    "projects": [
+      "src\\Shiny.Aspire.Hosting.Gluetun\\Shiny.Aspire.Hosting.Gluetun.csproj",
+      "src\\Shiny.Aspire.Orleans.Client\\Shiny.Aspire.Orleans.Client.csproj",
+      "src\\Shiny.Aspire.Orleans.Hosting\\Shiny.Aspire.Orleans.Hosting.csproj",
+      "src\\Shiny.Aspire.Orleans.Server\\Shiny.Aspire.Orleans.Server.csproj",
+      "tests\\Shiny.Aspire.Hosting.Gluetun.Tests\\Shiny.Aspire.Hosting.Gluetun.Tests.csproj",
+      "tests\\Shiny.Aspire.Orleans.Tests\\Shiny.Aspire.Orleans.Tests.csproj"
+    ]
+  }
+}
