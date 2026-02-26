@@ -10,6 +10,7 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Packages.props" />
     <File Path="README.md" />
+    <File Path="version.json" />
   </Folder>
   <Project Path="src/Shiny.Aspire.Orleans.Client/Shiny.Aspire.Orleans.Client.csproj" />
   <Project Path="src/Shiny.Aspire.Orleans.Hosting/Shiny.Aspire.Orleans.Hosting.csproj" />
