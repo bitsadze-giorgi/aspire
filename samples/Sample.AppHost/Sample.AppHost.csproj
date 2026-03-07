@@ -10,6 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting.AppHost"/>
+        <PackageReference Include="Aspire.Hosting.Docker"/>
         <PackageReference Include="Aspire.Hosting.PostgreSQL"/>
     </ItemGroup>
 
@@ -17,6 +18,8 @@
         <ProjectReference Include="..\Sample.Silo\Sample.Silo.csproj"/>
         <ProjectReference Include="..\Sample.Api\Sample.Api.csproj"/>
         <ProjectReference Include="..\..\src\Shiny.Aspire.Orleans.Hosting\Shiny.Aspire.Orleans.Hosting.csproj"
+                          IsAspireProjectResource="false"/>
+        <ProjectReference Include="..\..\src\Shiny.Aspire.Hosting.Gluetun\Shiny.Aspire.Hosting.Gluetun.csproj"
                           IsAspireProjectResource="false"/>
     </ItemGroup>
 

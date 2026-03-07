@@ -18,6 +18,7 @@
         <PackageVersion Include="Microsoft.Orleans.Clustering.AdoNet" Version="$(OrleansVersion)"/>
         <PackageVersion Include="Microsoft.Orleans.Persistence.AdoNet" Version="$(OrleansVersion)"/>
         <PackageVersion Include="Microsoft.Orleans.Reminders.AdoNet" Version="$(OrleansVersion)"/>
+        <PackageVersion Include="Microsoft.Orleans.Dashboard" Version="$(OrleansVersion)"/>
         <!-- ADO.NET Providers -->
         <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.4"/>
         <PackageVersion Include="Npgsql" Version="10.0.1"/>
