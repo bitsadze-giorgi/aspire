@@ -1,6 +1,8 @@
 # Shiny Aspire Libraries
 
-Zero-friction integration between [.NET Aspire](https://learn.microsoft.com/dotnet/aspire/) and [Microsoft Orleans](https://learn.microsoft.com/dotnet/orleans/) for ADO.NET storage backends. Automatically provisions Orleans database schemas and wires up clustering, grain persistence, and reminders from Aspire configuration -- no manual SQL scripts or connection string plumbing required.
+Zero-friction integration between [.NET Aspire](https://learn.microsoft.com/dotnet/aspire/) and [Microsoft Orleans](https://learn.microsoft.com/dotnet/orleans/) for ADO.NET storage backends. Automatically provisions Orleans database schemas and wires up clustering, grain persistence, and reminders from Aspire configuration — no manual SQL scripts or connection string plumbing required.
+
+Also includes an Aspire hosting integration for [Gluetun](https://github.com/qdm12/gluetun) VPN containers.
 
 ## Supported Databases
 
@@ -12,9 +14,10 @@ Zero-friction integration between [.NET Aspire](https://learn.microsoft.com/dotn
 
 | Package | NuGet | Usage |
 |---|---|---|
-| `Shiny.Aspire.Orleans.Hosting` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Hosting.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Hosting) | Aspire AppHost -- auto-runs Orleans schema scripts when the database becomes ready |
-| `Shiny.Aspire.Orleans.Server` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Server.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Server) | Orleans silo -- configures ADO.NET clustering, grain storage, and reminders from Aspire config |
-| `Shiny.Aspire.Orleans.Client` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Client.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Client) | Orleans client -- configures ADO.NET clustering from Aspire config |
+| `Shiny.Aspire.Orleans.Hosting` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Hosting.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Hosting) | Aspire AppHost — auto-runs Orleans schema scripts when the database becomes ready |
+| `Shiny.Aspire.Orleans.Server` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Server.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Server) | Orleans silo — registers ADO.NET providers for clustering, grain storage, and reminders |
+| `Shiny.Aspire.Orleans.Client` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Orleans.Client.svg)](https://www.nuget.org/packages/Shiny.Aspire.Orleans.Client) | Orleans client — registers ADO.NET clustering provider |
+| `Shiny.Aspire.Hosting.Gluetun` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Hosting.Gluetun.svg)](https://www.nuget.org/packages/Shiny.Aspire.Hosting.Gluetun) | Aspire AppHost — adds a Gluetun VPN container and routes other containers through it |
 
 ## Quick Start
 
@@ -28,6 +31,7 @@ using Shiny.Aspire.Orleans.Hosting;
 var builder = DistributedApplication.CreateBuilder(args);
 
 var db = builder.AddPostgres("pg")
+    .WithPgAdmin()
     .AddDatabase("orleans-db");
 
 var orleans = builder.AddOrleans("cluster")
@@ -51,18 +55,35 @@ builder.Build().Run();
 
 ### 2. Orleans Silo
 
-Install `Shiny.Aspire.Orleans.Server` in your silo project.
+Install `Shiny.Aspire.Orleans.Server` in your silo project. The package registers Orleans provider builders for all supported database types (`PostgresDatabase`, `SqlServerDatabase`, `MySqlDatabase`) via assembly-level `[RegisterProvider]` attributes. Orleans' `ApplyConfiguration` automatically resolves these providers from the Aspire-injected configuration.
+
+Call `silo.UseAdoNet()` inside `UseOrleans` for discoverability — provider registration is automatic when the package is referenced.
 
 ```csharp
 using Shiny.Aspire.Orleans.Server;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.UseOrleansWithAdoNet(); // reads Aspire-injected config automatically
+
+builder.UseOrleans(silo =>
+{
+    silo.UseAdoNet();
+});
+
 var app = builder.Build();
 app.Run();
 ```
 
-`UseOrleansWithAdoNet()` reads the `Orleans:Clustering`, `Orleans:GrainStorage`, and `Orleans:Reminders` configuration sections that Aspire injects automatically, and configures the appropriate ADO.NET providers with the correct connection strings and invariants.
+Because the extension is on `ISiloBuilder`, you can compose it with other Orleans features:
+
+```csharp
+using Shiny.Aspire.Orleans.Server;
+
+builder.UseOrleans(silo =>
+{
+    silo.UseAdoNet();
+    // add other silo configuration here
+});
+```
 
 ### 3. Orleans Client
 
@@ -72,7 +93,12 @@ Install `Shiny.Aspire.Orleans.Client` in your client project (e.g. an API gatewa
 using Shiny.Aspire.Orleans.Client;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.UseOrleansClientWithAdoNet(); // reads Aspire-injected config automatically
+
+builder.UseOrleans(silo =>
+{
+    silo.UseAdoNetClient();
+});
+
 var app = builder.Build();
 
 app.MapGet("/counter/{name}", async (string name, IClusterClient client) =>
@@ -121,9 +147,21 @@ var db = builder.AddSqlServer("sql").AddDatabase("orleans-db");
 var db = builder.AddMySql("mysql").AddDatabase("orleans-db");
 ```
 
-Everything else stays the same -- the correct SQL scripts, connection provider, and ADO.NET invariant are selected automatically.
+Everything else stays the same — the correct SQL scripts, connection provider, and ADO.NET invariant are selected automatically.
 
 ## How It Works
+
+### Provider Registration
+
+The Server and Client packages register Orleans provider builders via `[assembly: RegisterProvider]` attributes. When Orleans calls `ApplyConfiguration`, it reads the Aspire-injected configuration (e.g. `Orleans:Clustering:ProviderType = "PostgresDatabase"`) and resolves the matching provider builder automatically. The provider builder maps the database type to the correct ADO.NET invariant and connection string.
+
+Registered provider names:
+
+| ProviderType | Invariant | Kinds |
+|---|---|---|
+| `PostgresDatabase` | `Npgsql` | Clustering, GrainStorage, Reminders |
+| `SqlServerDatabase` | `Microsoft.Data.SqlClient` | Clustering, GrainStorage, Reminders |
+| `MySqlDatabase` | `MySql.Data.MySqlClient` | Clustering, GrainStorage, Reminders |
 
 ### Configuration Flow
 
@@ -139,16 +177,16 @@ Orleans:Reminders:ServiceKey    = "orleans-db"
 ConnectionStrings:orleans-db    = "Host=...;Database=..."
 ```
 
-The `UseOrleansWithAdoNet()` and `UseOrleansClientWithAdoNet()` extension methods read these sections and configure Orleans with the matching ADO.NET providers (`Npgsql`, `Microsoft.Data.SqlClient`, or `MySqlConnector`).
+Orleans' `ApplyConfiguration` reads these sections and delegates to the registered provider builders, which configure the ADO.NET providers (`Npgsql`, `Microsoft.Data.SqlClient`, or `MySqlConnector`) with the correct connection strings and invariants.
 
 ### Schema Provisioning
 
 `WithDatabaseSetup` runs embedded SQL scripts in order:
 
-1. **Main** -- creates the `OrleansQuery` table (Orleans' query registry)
-2. **Clustering** -- creates `OrleansMembershipVersionTable`, `OrleansMembershipTable`, and related stored procedures/functions
-3. **Persistence** -- creates the `OrleansStorage` table and related stored procedures/functions
-4. **Reminders** -- creates `OrleansRemindersTable` and related stored procedures/functions
+1. **Main** — creates the `OrleansQuery` table (Orleans' query registry)
+2. **Clustering** — creates `OrleansMembershipVersionTable`, `OrleansMembershipTable`, and related stored procedures/functions
+3. **Persistence** — creates the `OrleansStorage` table and related stored procedures/functions
+4. **Reminders** — creates `OrleansRemindersTable` and related stored procedures/functions
 
 Scripts are executed when Aspire raises the `ResourceReadyEvent` for the database, ensuring the database is accepting connections before any schema setup runs.
 
@@ -177,11 +215,11 @@ The `samples/` directory contains a complete working example:
 
 | Project | Description |
 |---|---|
-| `Sample.AppHost` | Aspire orchestrator wiring PostgreSQL, Orleans silo, and API |
-| `Sample.Silo` | Orleans silo host |
-| `Sample.Api` | HTTP API that calls grains via `IClusterClient` |
-| `Sample.GrainInterfaces` | `ICounterGrain` interface |
-| `Sample.Grains` | `CounterGrain` with persistent state |
+| `Sample.AppHost` | Aspire orchestrator wiring PostgreSQL + PgAdmin, Orleans cluster, API, Gluetun VPN |
+| `Sample.Silo` | Orleans silo with ADO.NET providers |
+| `Sample.Api` | HTTP API with counter and reminder endpoints via `IClusterClient` |
+| `Sample.GrainInterfaces` | `ICounterGrain` and `IReminderGrain` interfaces |
+| `Sample.Grains` | `CounterGrain` (persistent state) and `ReminderGrain` (ADO.NET reminders) |
 
 Run the sample:
 
@@ -194,12 +232,6 @@ dotnet run --project samples/Sample.AppHost
 # Shiny.Aspire.Hosting.Gluetun
 
 Aspire hosting integration for [Gluetun](https://github.com/qdm12/gluetun), a lightweight VPN client container supporting multiple providers. Models Gluetun as a first-class Aspire resource and lets other containers route their traffic through the VPN tunnel.
-
-## Package
-
-| Package | NuGet | Usage |
-|---|---|---|
-| `Shiny.Aspire.Hosting.Gluetun` | [![NuGet](https://img.shields.io/nuget/v/Shiny.Aspire.Hosting.Gluetun.svg)](https://www.nuget.org/packages/Shiny.Aspire.Hosting.Gluetun) | Aspire AppHost -- adds a Gluetun VPN container and routes other containers through it |
 
 ## Quick Start
 
@@ -245,18 +277,18 @@ The optional port parameters expose Gluetun's built-in HTTP proxy (default targe
 // Set the VPN service provider (required)
 vpn.WithVpnProvider("mullvad");
 
-// OpenVPN -- string credentials
+// OpenVPN — string credentials
 vpn.WithOpenVpn("username", "password");
 
-// OpenVPN -- Aspire parameter resources (recommended for secrets)
+// OpenVPN — Aspire parameter resources (recommended for secrets)
 vpn.WithOpenVpn(
     builder.AddParameter("openvpn-user"),
     builder.AddParameter("openvpn-pass", secret: true));
 
-// WireGuard -- string key
+// WireGuard — string key
 vpn.WithWireGuard("my-private-key");
 
-// WireGuard -- Aspire parameter resource (recommended for secrets)
+// WireGuard — Aspire parameter resource (recommended for secrets)
 vpn.WithWireGuard(builder.AddParameter("wireguard-key", secret: true));
 ```
 
