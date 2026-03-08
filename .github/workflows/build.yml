@@ -37,7 +37,7 @@ jobs:
     - name: Build
       run: |
         dotnet build build.slnf /restore -m -property:Configuration=Release
-        dotnet build src/Shiny.Aspire.Orleans.Hosting/Shiny.Aspire.Orleans.Hosting.csproj /restore -m -property:Configuration=Release  -property:PublicRelease=true
+        dotnet build src/Shiny.Aspire.Orleans.Hosting/Shiny.Aspire.Orleans.Hosting.csproj /restore -m -property:Configuration=Release -property:PublicRelease=true
 
     - name: Post NuGet Artifacts
       uses: actions/upload-artifact@v4

@@ -12,7 +12,5 @@
     <ItemGroup>
         <PackageReference Include="Aspire.Hosting"/>
         <PackageReference Include="Aspire.Hosting.Docker"/>
-        <PackageReference Include="Nerdbank.GitVersioning" PrivateAssets="all"/>
     </ItemGroup>
-
 </Project>
