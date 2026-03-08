@@ -7,7 +7,8 @@ var vpnUser = builder.AddParameter("vpn-user", secret: true);
 var vpnPassword = builder.AddParameter("vpn-password", secret: true);
 
 // --- Database ---
-var db = builder.AddPostgres("pg")
+var db = builder
+    .AddPostgres("pg")
     .WithPgAdmin()
     .AddDatabase("orleans-db");
 
@@ -19,7 +20,7 @@ var orleans = builder.AddOrleans("cluster")
     .WithDatabaseSetup(db);
 
 // --- Silo (full server with dashboard) ---
-builder.AddProject<Projects.Sample_Silo>("silo")
+var silo = builder.AddProject<Projects.Sample_Silo>("silo")
     .WithReference(orleans)
     .WithHttpsEndpoint(port: 8080, name: "dashboard")
     .WaitFor(db);
@@ -27,7 +28,7 @@ builder.AddProject<Projects.Sample_Silo>("silo")
 // --- API (client) ---
 builder.AddProject<Projects.Sample_Api>("api")
     .WithReference(orleans.AsClient())
-    .WaitFor(db);
+    .WaitFor(silo);
 
 // --- Gluetun VPN container (demo) ---
 var gluetun = builder.AddGluetun("vpn")

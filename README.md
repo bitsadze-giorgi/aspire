@@ -94,9 +94,9 @@ using Shiny.Aspire.Orleans.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.UseOrleans(silo =>
+builder.UseOrleansClient(client =>
 {
-    silo.UseAdoNetClient();
+    client.UseAdoNetClient();
 });
 
 var app = builder.Build();
@@ -110,8 +110,6 @@ app.MapGet("/counter/{name}", async (string name, IClusterClient client) =>
 
 app.Run();
 ```
-
-## Feature Selection
 
 By default, `WithDatabaseSetup` creates schemas for all Orleans features. You can limit this using the `OrleansFeature` flags enum:
 

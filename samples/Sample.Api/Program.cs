@@ -3,7 +3,7 @@ using Shiny.Aspire.Orleans.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.UseOrleans(silo => silo.UseAdoNetClient());
+builder.UseOrleansClient(silo => silo.UseAdoNetClient());
 
 var app = builder.Build();
 

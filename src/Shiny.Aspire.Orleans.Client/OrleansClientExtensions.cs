@@ -7,5 +7,5 @@ public static class OrleansClientExtensions
     /// Provider configuration is resolved automatically from Aspire-injected configuration
     /// via registered Orleans provider builders (PostgresDatabase, SqlServerDatabase, MySqlDatabase).
     /// </summary>
-    public static ISiloBuilder UseAdoNetClient(this ISiloBuilder siloBuilder) => siloBuilder;
+    public static IClientBuilder UseAdoNetClient(this IClientBuilder clientBuilder) => clientBuilder;
 }

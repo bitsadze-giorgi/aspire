@@ -253,3 +253,15 @@ VALUES
     DELETE FROM OrleansMembershipVersionTable
     WHERE DeploymentId = @DeploymentId AND @DeploymentId IS NOT NULL;
 ');
+
+-- Migration: Clustering 3.7.0
+INSERT INTO OrleansQuery(QueryKey, QueryText)
+VALUES
+(
+    'CleanupDefunctSiloEntriesKey','
+    DELETE FROM OrleansMembershipTable
+    WHERE DeploymentId = @DeploymentId
+        AND @DeploymentId IS NOT NULL
+        AND IAmAliveTime < @IAmAliveTime
+        AND Status !=3;
+');
