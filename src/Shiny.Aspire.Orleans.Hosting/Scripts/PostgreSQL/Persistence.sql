@@ -1,4 +1,4 @@
-CREATE TABLE OrleansStorage
+CREATE TABLE IF NOT EXISTS OrleansStorage
 (
     grainidhash integer NOT NULL,
     grainidn0 bigint NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE OrleansStorage
     version integer
 );
 
-CREATE INDEX ix_orleansstorage
+CREATE INDEX IF NOT EXISTS ix_orleansstorage
     ON orleansstorage USING btree
     (grainidhash, graintypehash);
 
@@ -133,7 +133,7 @@ END
 
 $function$;
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'WriteToStorageKey','
@@ -141,7 +141,7 @@ VALUES
         select * from WriteToStorage(@GrainIdHash, @GrainIdN0, @GrainIdN1, @GrainTypeHash, @GrainTypeString, @GrainIdExtensionString, @ServiceId, @GrainStateVersion, @PayloadBinary);
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'ReadFromStorageKey','
@@ -161,7 +161,7 @@ VALUES
         AND ServiceId = @ServiceId AND @ServiceId IS NOT NULL
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'ClearStorageKey','
@@ -181,7 +181,7 @@ VALUES
     Returning Version as NewGrainStateVersion
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'DeleteStorageKey','
