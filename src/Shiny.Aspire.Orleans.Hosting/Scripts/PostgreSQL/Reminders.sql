@@ -1,5 +1,5 @@
 -- Orleans Reminders table - https://learn.microsoft.com/dotnet/orleans/grains/timers-and-reminders
-CREATE TABLE OrleansRemindersTable
+CREATE TABLE IF NOT EXISTS OrleansRemindersTable
 (
     ServiceId varchar(150) NOT NULL,
     GrainId varchar(150) NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE OrleansRemindersTable
     CONSTRAINT PK_RemindersTable_ServiceId_GrainId_ReminderName PRIMARY KEY(ServiceId, GrainId, ReminderName)
 );
 
-CREATE FUNCTION upsert_reminder_row(
+CREATE OR REPLACE FUNCTION upsert_reminder_row(
     ServiceIdArg    OrleansRemindersTable.ServiceId%TYPE,
     GrainIdArg      OrleansRemindersTable.GrainId%TYPE,
     ReminderNameArg OrleansRemindersTable.ReminderName%TYPE,
@@ -58,7 +58,7 @@ BEGIN
 END
 $func$ LANGUAGE plpgsql;
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'UpsertReminderRowKey','
@@ -72,7 +72,7 @@ VALUES
     );
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'ReadReminderRowsKey','
@@ -88,7 +88,7 @@ VALUES
         AND GrainId = @GrainId AND @GrainId IS NOT NULL;
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'ReadReminderRowKey','
@@ -105,7 +105,7 @@ VALUES
         AND ReminderName = @ReminderName AND @ReminderName IS NOT NULL;
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'ReadRangeRows1Key','
@@ -122,7 +122,7 @@ VALUES
         AND GrainHash <= @EndHash AND @EndHash IS NOT NULL;
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'ReadRangeRows2Key','
@@ -139,7 +139,7 @@ VALUES
         OR (GrainHash <= @EndHash AND @EndHash IS NOT NULL));
 ');
 
-CREATE FUNCTION delete_reminder_row(
+CREATE OR REPLACE FUNCTION delete_reminder_row(
     ServiceIdArg    OrleansRemindersTable.ServiceId%TYPE,
     GrainIdArg      OrleansRemindersTable.GrainId%TYPE,
     ReminderNameArg OrleansRemindersTable.ReminderName%TYPE,
@@ -166,7 +166,7 @@ BEGIN
 END
 $func$ LANGUAGE plpgsql;
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'DeleteReminderRowKey','
@@ -178,7 +178,7 @@ VALUES
     );
 ');
 
-INSERT INTO OrleansQuery(QueryKey, QueryText)
+INSERT OR UPDATE INTO OrleansQuery(QueryKey, QueryText)
 VALUES
 (
     'DeleteReminderRowsKey','
